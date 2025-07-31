@@ -1,13 +1,29 @@
 const express = require("express");
-
+const cors = require("cors");
 const app = express();
+require ("dotenv").config();
 
-app.get("/hello" , (req,res)=>{
-    res.status(200).json({msg:"backend ok"})
-})
+//middleware
+app.use(cors());
+app.use(express.json());
+
+//routes
+const routes = require("./routes");
+app.get("/", (req, res) => res.send("API is running"));
+app.use("/api", routes);
 
 const port = 5000;
 
-app.listen(port, ()=>{
-    console.log(`server is listening on port ${port}`);
-})
+//db connenction
+const connectDb = require("./connectDb");
+
+const startServer = async () => {
+    await connectDb();
+    app.listen(port, ()=>{
+        console.log(`server is listening on port ${port}`);
+    })
+}
+
+startServer().catch((err) => {
+    console.error("Failed to start server:", err);
+});
